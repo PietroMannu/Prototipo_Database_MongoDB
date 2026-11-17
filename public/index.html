@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Prototipo MongoDB</title>
+</head>
+<body>
+    <h1>Prototipo MongoDB</h1>
+
+    <input id="googleId" placeholder="googleId (es. 123)">
+    <input id="displayName" placeholder="Nome">
+    <input id="email" placeholder="Email">
+    <button id="save">Salva</button>
+    <p id="msg"></p>
+
+    <h2>Utenti nel database</h2>
+    <ul id="list"></ul>
+
+    <script>
+        async function loadUsers() {
+            const res = await fetch("/users");
+            const users = await res.json();
+            const ul = document.getElementById("list");
+            ul.replaceChildren();
+            users.forEach(u => {
+                const li = document.createElement("li");
+                li.textContent = `${u.googleId} - ${u.displayName} - ${u.email}`;
+                ul.append(li);
+            });
+        }
+
+        document.getElementById("save").addEventListener("click", async () => {
+            const body = {
+                googleId: document.getElementById("googleId").value,
+                displayName: document.getElementById("displayName").value,
+                email: document.getElementById("email").value
+            };
+            const res = await fetch("/users", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            document.getElementById("msg").textContent = data.message;
+            loadUsers();
+        });
+
+        loadUsers();
+    </script>
+</body>
+</html>
